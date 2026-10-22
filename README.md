@@ -39,7 +39,7 @@ python -m pytest -q
 
 **深度阅读：** [docs/EXPERIMENT_GUIDE.md](docs/EXPERIMENT_GUIDE.md) 中逐一解释假设、公式、控制变量、可视化意义、局限与反例。
 
-**交互 Notebook：** [notebooks/curse_of_dimensionality.ipynb](notebooks/curse_of_dimensionality.ipynb)，另有可独立阅读的中文实验教材。启动：`jupyter lab notebooks/curse_of_dimensionality.ipynb`。
+**交互 Notebook：** [notebooks/curse_of_dimensionality.ipynb](notebooks/curse_of_dimensionality.ipynb)，附中文阅读引导与交互运行单元。启动：`jupyter lab notebooks/curse_of_dimensionality.ipynb`。
 
 ## 工程布局
 
