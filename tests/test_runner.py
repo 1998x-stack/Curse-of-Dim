@@ -8,10 +8,12 @@ import pytest
 from curse_of_dim.experiments import EXPERIMENTS, run_selected
 
 
-def test_seven_distinct_experiments():
+def test_experiment_registry():
     assert list(EXPERIMENTS) == [
         "geometry", "distances", "knn_noise", "sample_complexity",
         "intrinsic_dimension", "double_descent", "conditioning",
+        "nonlinear_manifold", "embedding_anisotropy", "effective_dimension",
+        "autoencoder_manifold",
     ]
 
 

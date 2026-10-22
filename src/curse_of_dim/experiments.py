@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Curse of dimensionality: seven reproducible experiments.
 Dependencies: numpy, scipy, scikit-learn, matplotlib, threadpoolctl.
-Run: python -m curse_of_dim --experiment all --out outputs
+Run: python curse_dimensionality_lab.py --out figures
 """
 from pathlib import Path
 import numpy as np
@@ -15,6 +15,7 @@ from sklearn.linear_model import LogisticRegression, Ridge
 from sklearn.decomposition import PCA
 from sklearn.metrics import accuracy_score, mean_squared_error
 from threadpoolctl import threadpool_limits
+from . import advanced as _advanced
 
 plt.rcParams.update({
     "figure.dpi": 110, "savefig.dpi": 150,
@@ -378,8 +379,9 @@ def experiment_07_conditioning():
 
 
 def run_all(out="figures"):
-    """Execute all seven experiments in canonical order."""
-    return run_selected(tuple(EXPERIMENTS), out=out)
+    """Execute the default experiments (excluding optional torch autoencoder)."""
+    return run_selected(tuple(n for n in EXPERIMENTS if n != "autoencoder_manifold"), out=out)
+
 
 
 EXPERIMENTS = {
@@ -390,7 +392,12 @@ EXPERIMENTS = {
     "intrinsic_dimension": experiment_05_intrinsic,
     "double_descent": experiment_06_double_descent,
     "conditioning": experiment_07_conditioning,
+    "nonlinear_manifold": lambda: _advanced.experiment_08_nonlinear_manifold(OUTPUT_DIR),
+    "embedding_anisotropy": lambda: _advanced.experiment_09_anisotropic_embeddings(OUTPUT_DIR),
+    "effective_dimension": lambda: _advanced.experiment_10_effective_dimension(OUTPUT_DIR),
+    "autoencoder_manifold": lambda: _advanced.experiment_11_autoencoder(OUTPUT_DIR),
 }
+
 
 
 def run_selected(names, out="figures"):

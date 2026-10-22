@@ -39,7 +39,7 @@ python -m pytest -q
 
 **深度阅读：** [docs/EXPERIMENT_GUIDE.md](docs/EXPERIMENT_GUIDE.md) 中逐一解释假设、公式、控制变量、可视化意义、局限与反例。
 
-**交互 Notebook：** [notebooks/curse_of_dimensionality.ipynb](notebooks/curse_of_dimensionality.ipynb)，附中文阅读引导与交互运行单元。启动：`jupyter lab notebooks/curse_of_dimensionality.ipynb`。
+**交互 Notebook：** [notebooks/curse_of_dimensionality.ipynb](notebooks/curse_of_dimensionality.ipynb)，另有可独立阅读的中文实验教材。启动：`jupyter lab notebooks/curse_of_dimensionality.ipynb`。
 
 ## 工程布局
 
@@ -71,3 +71,33 @@ Curse-of-Dim/
 ## License
 
 MIT, see [LICENSE](LICENSE).
+
+## 深入扩展（08–11）：流形、Embedding 与检索
+
+新实验详见 [docs/EMBEDDING_GEOMETRY.md](docs/EMBEDDING_GEOMETRY.md) 和 [可交互深入实验 Notebook](notebooks/embedding_geometry_deep_dive.ipynb)。均可使用 CPU，无需下载真实模型或外部数据。
+
+| ID | 问题 | 图 |
+|---|---|---|
+| `nonlinear_manifold` | Swiss roll：线性 PCA 能否正确展开非线性流形？对比 Isomap 的邻居保持率 | `08_nonlinear_manifold.png` |
+| `embedding_anisotropy` | 均值方向、第一主成分和 cosine 检索；包括移除 PC1 使结果变差的反例 | `09_anisotropy_retrieval.png` |
+| `effective_dimension` | 128维表示中仅6个潜在因素；噪声如何改变有效秩和近邻重叠率 | `10_effective_dimension.png` |
+| `autoencoder_manifold` | **可选 PyTorch**：比较2维瓶颈 AE、PCA、Isomap；检验重构误差与邻域恢复的差异 | `11_autoencoder_manifold.png` |
+
+```bash
+# 默认全部实验 01–10（无需 PyTorch）
+curse-of-dim -e all --out outputs/all
+
+# 仅高级实验
+curse-of-dim -e nonlinear_manifold,embedding_anisotropy,effective_dimension --out outputs/deep
+
+# 可选深度学习实验（单独安装 PyTorch）
+pip install -e '.[deep]'
+curse-of-dim -e autoencoder_manifold --out outputs/autoencoder
+
+# 真实 Embedding 本地审计（不会下载、上传或泄漏你的向量）
+curse-of-dim-audit --input /path/to/my_vectors.npz --out outputs/my_audit --k 5
+```
+
+真实向量文件 NPZ 必须含 `doc_embeddings` 与 `query_embeddings` 两个二维数值数组；可选提供 `doc_labels` 与 `query_labels` 用于 `precision@k` 和 `hit@k`。查询集合必须独立于数据库集合；否则检索结果存在身份泄漏。所有标准化及 PCA 都仅对数据库 `fit`，然后应用于查询。
+
+> 注意：有效秩不是严格的流形内在维度，均值中心化只能改变余弦几何、无法改变欧氏距离，删除 PC1 和白化都不是通用性能改进策略。使用真实 Embedding 时必须检查任务指标，而不能仅根据各向同性程度下结论。

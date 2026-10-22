@@ -23,6 +23,7 @@ def make_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = make_parser().parse_args(argv)
+    # Headless-safe even on minimal Linux/CI runners.
     os.environ.setdefault("MPLBACKEND", "Agg")
     from .experiments import EXPERIMENTS, run_selected
 
@@ -35,7 +36,8 @@ def main(argv: list[str] | None = None) -> int:
     unknown = set(tokens) - set(EXPERIMENTS) - {"all"}
     if unknown:
         make_parser().error(f"Unknown experiment(s): {', '.join(sorted(unknown))}")
-    names = list(EXPERIMENTS) if "all" in tokens else list(dict.fromkeys(tokens))
+    names = ([n for n in EXPERIMENTS if n != "autoencoder_manifold"]
+             if "all" in tokens else list(dict.fromkeys(tokens)))
     metrics = run_selected(names, out=args.out)
     metrics_path = args.out / "metrics.json"
     metrics_path.write_text(json.dumps(metrics, indent=2, ensure_ascii=False, allow_nan=False) + "\n", encoding="utf-8")
