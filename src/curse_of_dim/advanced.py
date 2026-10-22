@@ -253,17 +253,17 @@ def experiment_10_effective_dimension(out: str | Path = "outputs") -> dict:
                "pca_overlap_at_10": knn_overlap(z[:n], z[n:], proj[:n], proj[n:], 10)}
         metrics.append(row)
     fig, ax = plt.subplots(1, 3, figsize=(14.0, 4.25), constrained_layout=True)
-    l = [m["ambient_noise_sd"] for m in metrics]
+    noise_sd = [m["ambient_noise_sd"] for m in metrics]
     for key in ("entropy_rank", "participation_ratio"):
-        ax[0].plot(l, [m[key] for m in metrics], "o-", label=key)
+        ax[0].plot(noise_sd, [m[key] for m in metrics], "o-", label=key)
     ax[0].axhline(rank, color="gray", ls="--", label="true latent dimension")
     ax[0].set(title="Covariance effective rank", xlabel="per-coordinate Gaussian noise SD", ylabel="estimated rank")
     ax[0].legend(fontsize=8)
     for key,label in [("raw_overlap_at_10","ambient 128D"),("pca_overlap_at_10","PCA to 6D")]:
-        ax[1].plot(l, [m[key] for m in metrics], "o-", label=label)
+        ax[1].plot(noise_sd, [m[key] for m in metrics], "o-", label=label)
     ax[1].set(title="True latent kNN preserved?", xlabel="noise SD", ylabel="neighbor overlap@10", ylim=(0,1.05))
     ax[1].legend(fontsize=8)
-    ax[2].plot(l, [m["top1_share"] for m in metrics], "o-")
+    ax[2].plot(noise_sd, [m["top1_share"] for m in metrics], "o-")
     ax[2].set(title="Top covariance eigenvalue share", xlabel="noise SD", ylabel="PC1 variance share")
     fig.suptitle("10 | Same true 6D latent coordinates, growing 128D isotropic noise", fontsize=13)
     _save(fig, Path(out), "10_effective_dimension.png")
