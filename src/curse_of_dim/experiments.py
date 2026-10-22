@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Curse of dimensionality: seven reproducible experiments.
 Dependencies: numpy, scipy, scikit-learn, matplotlib, threadpoolctl.
-Run: python -m curse_of_dim --experiment all --out outputs
+Run: python curse_dimensionality_lab.py --out figures
 """
 from pathlib import Path
 import numpy as np
@@ -237,8 +237,7 @@ def experiment_05_intrinsic():
     ttemplate=zt@Q.T
     noise_train=rng.normal(size=(ntr,D))
     noise_test=rng.normal(size=(nte,D))
-    def f(zz):
-        return np.sin(1.5*zz[:,0]) + 0.5*zz[:,1]
+    f=lambda zz: np.sin(1.5*zz[:,0]) + 0.5*zz[:,1]
     y,yt=f(z),f(zt)
     sigmas=[0,.05,.1,.2,.35,.5]
     raw,pca,oracle=[],[],[]
@@ -281,8 +280,7 @@ def experiment_06_double_descent():
     """High-dimensional linear regression: curse is not universally exponential."""
     ntrain,ntest,dmax=110,500,300
     ds=[5,10,20,40,60,80,95,105,108,110,112,115,125,140,170,220,300]
-    w=np.array([1,.8,-.7,.5,-.5])
-    w=w/np.linalg.norm(w)
+    w=np.array([1,.8,-.7,.5,-.5]); w=w/np.linalg.norm(w)
     out=np.zeros((3,len(ds),3))  # repeat x dimension x (train OLS/test OLS/test Ridge)
     sigma=.5
     for j,seed in enumerate([60,61,62]):
@@ -335,8 +333,7 @@ def experiment_07_conditioning():
     def fit_path(x,nsteps=1600):
         eta=.9/np.linalg.eigvalsh(x.T@x/n).max()
         w=np.zeros(2)
-        errors=[]
-        paths=[]
+        errors=[]; paths=[]
         for _ in range(nsteps):
             r=x@w-y
             errors.append(np.mean(r*r)/2)
@@ -378,8 +375,11 @@ def experiment_07_conditioning():
 
 
 def run_all(out="figures"):
-    """Execute all seven experiments in canonical order."""
-    return run_selected(tuple(EXPERIMENTS), out=out)
+    """Execute the default experiments (excluding optional torch autoencoder)."""
+    return run_selected(tuple(n for n in EXPERIMENTS if n != "autoencoder_manifold"), out=out)
+
+
+from . import advanced as _advanced
 
 
 EXPERIMENTS = {
@@ -390,7 +390,12 @@ EXPERIMENTS = {
     "intrinsic_dimension": experiment_05_intrinsic,
     "double_descent": experiment_06_double_descent,
     "conditioning": experiment_07_conditioning,
+    "nonlinear_manifold": lambda: _advanced.experiment_08_nonlinear_manifold(OUTPUT_DIR),
+    "embedding_anisotropy": lambda: _advanced.experiment_09_anisotropic_embeddings(OUTPUT_DIR),
+    "effective_dimension": lambda: _advanced.experiment_10_effective_dimension(OUTPUT_DIR),
+    "autoencoder_manifold": lambda: _advanced.experiment_11_autoencoder(OUTPUT_DIR),
 }
+
 
 
 def run_selected(names, out="figures"):
